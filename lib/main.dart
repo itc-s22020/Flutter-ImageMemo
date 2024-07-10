@@ -9,7 +9,7 @@ void main() {
   ]);
 
   runApp(const MaterialApp(
-    title: 'PolyGraphy',
+    title: 'ImageMemoApp',
     home: Home(),
   ));
 }
