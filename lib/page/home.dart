@@ -12,7 +12,6 @@ class Home extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text('Hello Flutter!'),
-
             ],
           )
       ),

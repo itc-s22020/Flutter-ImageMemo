@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:image_memo/pages/home.dart';
+import 'package:image_memo/page/home.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
