@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:image_memo/pages/home.dart';
 
 void main() {
@@ -8,8 +9,9 @@ void main() {
     SystemUiOverlay.bottom
   ]);
 
-  runApp(const MaterialApp(
+  runApp(const GetMaterialApp(
     title: 'ImageMemoApp',
+    initialRoute: '/',
     home: Home(),
   ));
 }
