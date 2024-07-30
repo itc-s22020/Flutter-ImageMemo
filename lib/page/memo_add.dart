@@ -5,65 +5,104 @@ import 'package:image_memo/component/image_pick.dart';
 import 'package:image_memo/getx/image_controller.dart';
 import 'package:image_memo/getx/navigation.dart';
 
+import '../getx/memo_controller.dart';
+import '../sembast/memo.dart';
+
 class MemoAdd extends StatelessWidget {
-  const MemoAdd({super.key});
+  final MemoController controller = Get.find<MemoController>();
+  final TextEditingController titleController = TextEditingController();
+  final TextEditingController textController = TextEditingController();
+
+  MemoAdd({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: _MemoAddBody(),
+    return Scaffold(
+      body: _MemoAddBody(
+        titleController: titleController,
+        textController: textController,
+      ),
       floatingActionButton: FloatingActionButton(
-          onPressed: toBackPage, child: Icon(CupertinoIcons.xmark)),
+        onPressed: () {
+          _saveMemo();
+          toBackPage();
+        },
+        child: const Icon(CupertinoIcons.check_mark),
+      ),
     );
+  }
+
+  void _saveMemo() {
+    final imageController = Get.find<ImageController>();
+    final memo = Memo(
+      title: titleController.text,
+      text: textController.text,
+      imageBytes: imageController.image.value,
+    );
+    controller.addMemo(memo);
   }
 }
 
 class _MemoAddBody extends StatelessWidget {
-  const _MemoAddBody();
+  final TextEditingController titleController;
+  final TextEditingController textController;
+
+  const _MemoAddBody({
+    required this.titleController,
+    required this.textController,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Center(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text("createMemo"),
-              const SizedBox(height: 20),
-              const SizedBox(
-                width: 400,
-                child: TextField(
-                  decoration: InputDecoration(
-                      border: OutlineInputBorder(), labelText: "title"),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text("createMemo"),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: 400,
+              child: TextField(
+                controller: titleController,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: "title",
                 ),
               ),
-              const SizedBox(height: 20),
-              const SizedBox(
-                width: 400,
-                child: TextField(
-                  keyboardType: TextInputType.multiline,
-                  maxLines: 5,
-                  decoration: InputDecoration(
-                      border: OutlineInputBorder(), labelText: "memo"),
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: 400,
+              child: TextField(
+                controller: textController,
+                keyboardType: TextInputType.multiline,
+                maxLines: 5,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: "memo",
                 ),
               ),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: 400,
-                height: 40,
-                child: OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(5))),
-                  onPressed: imagePick,
-                  child: const Text("ImagePick"),
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: 400,
+              height: 40,
+              child: OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5),
+                  ),
                 ),
+                onPressed: imagePick,
+                child: const Text("ImagePick"),
               ),
-              const SizedBox(height: 10),
-              const _ImageView(),
-            ],
-          ),
-        )
+            ),
+            const SizedBox(height: 10),
+            const _ImageView(),
+          ],
+        ),
+      ),
     );
   }
 }
