@@ -10,7 +10,7 @@ Future<void> main() async {
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [
     SystemUiOverlay.bottom
   ]);
-  await Get.putAsync(() async => await MemoController().init());
+  Get.put<MemoController>(MemoController());
 
   runApp(const GetMaterialApp(
     title: 'ImageMemoApp',

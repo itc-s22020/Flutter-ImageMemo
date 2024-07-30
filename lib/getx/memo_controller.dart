@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:sembast/sembast.dart';
@@ -16,6 +18,7 @@ class MemoController extends GetxController {
   final store = intMapStoreFactory.store(storeName);
 
   final memos = <Memo>[].obs;
+  final _dbInitCompleter = Completer<void>();
 
   Future<void> _initDatabase() async {
     try {
@@ -31,39 +34,45 @@ class MemoController extends GetxController {
         if (kDebugMode) {
           print("Database initialized successfully");
         }
+        _dbInitCompleter.complete();
       }
     } catch (e, stackTrace) {
       if (kDebugMode) {
         print("Error initializing database: $e");
         print("StackTrace: $stackTrace");
       }
+      _dbInitCompleter.completeError(e);
     }
   }
 
   @override
-  void onInit() {
-    super.onInit();
-    _initDatabase();
-  }
-
-
-  Future<Database> _openDb() async {
-    final docsDir = await getApplicationDocumentsDirectory();
-    final dbPath = p.join(docsDir.path, dbName);
-    return await databaseFactoryIo.openDatabase(dbPath);
+  void onReady() {
+    super.onReady();
+    _initDatabase().then((_) {
+      loadMemos();
+    });
   }
 
   Future<void> loadMemos() async {
+    await _dbInitCompleter.future;
+    if (_db == null) {
+      if (kDebugMode) {
+        print("Database is not initialized");
+      }
+      return;
+    }
     final db = _db!;
     final snapshots = await store.find(db);
-    memos.value = snapshots.map((snapshot) {
+    final loadedMemos = snapshots.map((snapshot) {
       final memo = Memo.fromMap(snapshot.value);
       memo.id = snapshot.key;
       return memo;
     }).toList();
+    memos.assignAll(loadedMemos);
   }
 
   Future<void> addMemo(Memo memo) async {
+    await _dbInitCompleter.future;
     if (_db == null) {
       if (kDebugMode) {
         print("Database is not initialized");
@@ -75,8 +84,14 @@ class MemoController extends GetxController {
     memos.add(memo);
   }
 
-
   Future<void> updateMemo(Memo memo) async {
+    await _dbInitCompleter.future;
+    if (_db == null) {
+      if (kDebugMode) {
+        print("Database is not initialized");
+      }
+      return;
+    }
     final db = _db!;
     await store.update(
       db,
@@ -86,10 +101,18 @@ class MemoController extends GetxController {
     final index = memos.indexWhere((m) => m.id == memo.id);
     if (index != -1) {
       memos[index] = memo;
+      memos.refresh();
     }
   }
 
   Future<void> deleteMemo(int id) async {
+    await _dbInitCompleter.future;
+    if (_db == null) {
+      if (kDebugMode) {
+        print("Database is not initialized");
+      }
+      return;
+    }
     final db = _db!;
     await store.delete(
       db,
@@ -97,10 +120,5 @@ class MemoController extends GetxController {
     );
     memos.removeWhere((memo) => memo.id == id);
   }
-
-  Future<MemoController> init() async {
-    await _initDatabase();
-    return this;
-  }
-
 }
+

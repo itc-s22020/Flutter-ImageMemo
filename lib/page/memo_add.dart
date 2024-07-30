@@ -23,8 +23,8 @@ class MemoAdd extends StatelessWidget {
         textController: textController,
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _saveMemo();
+        onPressed: () async {
+          await _saveMemo();
           toBackPage();
         },
         child: const Icon(CupertinoIcons.check_mark),
@@ -32,14 +32,14 @@ class MemoAdd extends StatelessWidget {
     );
   }
 
-  void _saveMemo() {
+  Future<void> _saveMemo() async {
     final imageController = Get.find<ImageController>();
     final memo = Memo(
       title: titleController.text,
       text: textController.text,
       imageBytes: imageController.image.value,
     );
-    controller.addMemo(memo);
+    await controller.addMemo(memo);
   }
 }
 
